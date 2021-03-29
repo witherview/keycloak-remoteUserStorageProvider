@@ -1,6 +1,7 @@
 package com.witherview.keycloak.oauth.remoteuserstorage;
 
 import com.witherview.keycloak.oauth.account.AccountApiService;
+import com.witherview.keycloak.oauth.account.AccountDTO;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputValidator;
@@ -47,6 +48,7 @@ public class RemoteUserStorageProvider implements UserStorageProvider, UserLooku
         // 사용자가 있는지 api 호출 -> 있을 경우 createUserModel메소드 실행.
         UserModel returnValue = null;
         var user = accountApiService.getUserDetails(email);
+        System.out.println(user.getEmail());
         if (user != null) {
             returnValue = createUserModel(email, realm);
         }
@@ -75,7 +77,6 @@ public class RemoteUserStorageProvider implements UserStorageProvider, UserLooku
         var result = getCredentialStore()
                 .getStoredCredentialsStream(realm, user)
                 .findAny().isPresent();
-        System.out.println(result);
         return !result;
     }
     private UserCredentialStore getCredentialStore() {
@@ -84,7 +85,13 @@ public class RemoteUserStorageProvider implements UserStorageProvider, UserLooku
 
     @Override
     public boolean isValid(RealmModel realm, UserModel user, CredentialInput credentialInput) {
-        // 기존 서비스 로직상, userId / password가 다를 경우 이 메소드까지 오지 않고 Exception처리가 된다.
-        return true;
+        System.out.println("email " + user.getEmail());
+        System.out.println("username " + user.getUsername());
+        System.out.println("password " + credentialInput.getChallengeResponse());
+        AccountDTO.LoginDTO requestBody = new AccountDTO.LoginDTO();
+        requestBody.setEmail(user.getUsername());
+        requestBody.setPassword(credentialInput.getChallengeResponse());
+        var result = accountApiService.isValidPassword(requestBody);
+        return result;
     }
 }
