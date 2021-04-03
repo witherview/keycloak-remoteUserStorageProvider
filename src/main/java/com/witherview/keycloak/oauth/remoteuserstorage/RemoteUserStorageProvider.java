@@ -2,6 +2,7 @@ package com.witherview.keycloak.oauth.remoteuserstorage;
 
 import com.witherview.keycloak.oauth.account.AccountApiService;
 import com.witherview.keycloak.oauth.account.AccountDTO;
+import lombok.NoArgsConstructor;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputValidator;
@@ -10,12 +11,13 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
-import org.keycloak.storage.StorageId;
 import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.adapter.AbstractUserAdapter;
 import org.keycloak.storage.user.UserLookupProvider;
 
-public class RemoteUserStorageProvider implements UserStorageProvider, UserLookupProvider, CredentialInputValidator {
+@NoArgsConstructor
+public class RemoteUserStorageProvider implements UserStorageProvider, UserLookupProvider, CredentialInputValidator
+{
     private KeycloakSession session;
     private ComponentModel model;
     private AccountApiService accountApiService;
@@ -33,9 +35,11 @@ public class RemoteUserStorageProvider implements UserStorageProvider, UserLooku
 
     @Override
     public UserModel getUserById(String id, RealmModel realm) {
-        StorageId storageId = new StorageId(id);
-        String email = storageId.getExternalId();
-        return getUserByEmail(email, realm);
+        return null;
+//        System.out.println("getUserById");
+//        StorageId storageId = new StorageId(id);
+//        String email = storageId.getExternalId();
+//        return getUserByEmail(email, realm);
     }
 
     @Override
@@ -45,23 +49,20 @@ public class RemoteUserStorageProvider implements UserStorageProvider, UserLooku
 
     @Override
     public UserModel getUserByEmail(String email, RealmModel realm) {
-        // 사용자가 있는지 api 호출 -> 있을 경우 createUserModel메소드 실행.
         UserModel returnValue = null;
         var user = accountApiService.getUserDetails(email);
-        System.out.println(user.getEmail());
         if (user != null) {
-            returnValue = createUserModel(email, realm);
+            returnValue = createUserModel(user.getId(), realm);
         }
         return returnValue;
     }
 
-    private UserModel createUserModel(String email, RealmModel realm) {
-        return new AbstractUserAdapter(session, realm, model) {
+    private UserModel createUserModel(String id, RealmModel realm) {
+        UserModel user = new AbstractUserAdapter(session, realm, model) {
             @Override
-            public String getUsername() { return email; }
-            @Override
-            public String getEmail(){ return email; }
+            public String getUsername() { return id; }
         };
+        return user;
     }
 
     @Override
@@ -85,11 +86,9 @@ public class RemoteUserStorageProvider implements UserStorageProvider, UserLooku
 
     @Override
     public boolean isValid(RealmModel realm, UserModel user, CredentialInput credentialInput) {
-        System.out.println("email " + user.getEmail());
-        System.out.println("username " + user.getUsername());
-        System.out.println("password " + credentialInput.getChallengeResponse());
-        AccountDTO.LoginDTO requestBody = new AccountDTO.LoginDTO();
-        requestBody.setEmail(user.getUsername());
+        var userId = user.getId().split(":")[2];
+        AccountDTO.LoginValidateDTO requestBody = new AccountDTO.LoginValidateDTO();
+        requestBody.setUserId(userId);
         requestBody.setPassword(credentialInput.getChallengeResponse());
         var result = accountApiService.isValidPassword(requestBody);
         return result;
