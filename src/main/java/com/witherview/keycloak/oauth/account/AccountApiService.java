@@ -11,5 +11,5 @@ public interface AccountApiService {
 
     @POST
     @Path("/oauth/user")
-    boolean isValidPassword(AccountDTO.LoginDTO login);
+    boolean isValidPassword(AccountDTO.LoginValidateDTO login);
 }

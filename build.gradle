@@ -10,6 +10,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
 configurations {
+    compile.exclude group: "org.slf4j", module: "slf4j-log4j12"
     compileOnly {
         extendsFrom annotationProcessor
     }
@@ -27,6 +28,14 @@ dependencies {
     implementation group: 'org.keycloak', name: 'keycloak-core', version: '12.0.4'
     // https://mvnrepository.com/artifact/org.keycloak/keycloak-services
     compileOnly group: 'org.keycloak', name: 'keycloak-services', version: '12.0.4'
+    // https://mvnrepository.com/artifact/org.keycloak/keycloak-server-spi-private
+    compileOnly group: 'org.keycloak', name: 'keycloak-server-spi-private', version: '12.0.4'
+
+    // webclient
+    implementation group: 'org.springframework', name: 'spring-webflux'
+    // https://mvnrepository.com/artifact/io.projectreactor.netty/reactor-netty
+    implementation group: 'io.projectreactor.netty', name: 'reactor-netty'
+
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
