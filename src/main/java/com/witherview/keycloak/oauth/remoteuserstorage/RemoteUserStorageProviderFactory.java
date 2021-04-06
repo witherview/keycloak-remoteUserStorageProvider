@@ -13,7 +13,7 @@ public class RemoteUserStorageProviderFactory implements UserStorageProviderFact
     public static final String PROVIDER_NAME = "witherview-MySQL";
 
 //    @Value("${connect.server}")
-    private String serviceUri = "http://localhost:8080";
+    private String serviceUri = "http://15.164.232.147:8080";
 
     @Override
     public RemoteUserStorageProvider create(KeycloakSession session, ComponentModel model) {
