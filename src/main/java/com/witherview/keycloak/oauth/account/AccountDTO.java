@@ -1,8 +1,10 @@
 package com.witherview.keycloak.oauth.account;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AccountDTO {
     @Getter @Setter
     public static class LoginValidateDTO {
