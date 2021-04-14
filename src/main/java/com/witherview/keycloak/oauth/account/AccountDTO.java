@@ -1,7 +1,9 @@
 package com.witherview.keycloak.oauth.account;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
+
 
 public class AccountDTO {
     @Getter @Setter
@@ -9,7 +11,7 @@ public class AccountDTO {
         private String userId;
         private String password;
     }
-    @Getter @Setter
+    @Getter @Setter @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ResponseLogin {
         private String id;
         private String email;
